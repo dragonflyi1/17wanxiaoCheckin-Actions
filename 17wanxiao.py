@@ -4,6 +4,7 @@ import json
 import logging
 import requests
 
+from configparser import ConfigParser
 from login import CampusCard
 
 
@@ -360,9 +361,21 @@ def run():
 ```
 {bj_time.strftime("%Y-%m-%d %H:%M:%S %p")}
 ```"""]
-    username_list = input().split(',')
-    password_list = input().split(',')
-    sckey = input()
+    #入口
+    print("读取配置")
+    config = ConfigParser()
+    config.read('config.json', encoding='UTF-8-sig')
+    if config['main']['use_secret']=='true':
+        username_list = input().split(',')
+        password_list = input().split(',')
+        sckey = input()
+    elif config['main']['use_secret']=='false':
+        username_list = config['account']['user'].split(',')
+        password_list = config['account']['passwd'].split(',')
+        sckey = config['account']['sckey']
+    else:
+        print("参数错误")
+        exit (config['main']['use_secret'])
     for username, password in zip([i.strip() for i in username_list if i != ''],
                                   [i.strip() for i in password_list if i != '']):
         check_dict = check_in(username, password)

@@ -1,0 +1,18 @@
+#coding:utf-8
+[main]
+
+# 是否在secret调用账户信息,适用于Action
+# 开启之后[account]部分失效
+
+use_secret = true
+
+
+[account]
+#用户信息，一般是电话号码，用,隔开
+user=
+
+#密码信息，用,隔开
+passwd=
+
+#server酱的推送，暂时只有一个
+sckey=
