@@ -168,13 +168,10 @@ def healthy_check_in(username, token, post_dict):
             logging.info(res)
             return dict(status=1, res=res, post_dict=post_dict, check_json=check_json, type='healthy')
     except BaseException:
-        errmsg = f"```打卡请求出错```"
         logging.warning(str(res))
         logging.warning('校内打卡请求出错,一分钟后重试...')
         time.sleep(60)
-        healthy_check_in(username, token, post_dict)
-        return dict(status=0, errmsg=errmsg)
-
+        return healthy_check_in(username, token, post_dict)
 
 def campus_check_in(username, token, post_dict, id):
     check_json = {"businessType": "epmpics", "method": "submitUpInfoSchool",
