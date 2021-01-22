@@ -169,7 +169,8 @@ def healthy_check_in(username, token, post_dict):
             return dict(status=1, res=res, post_dict=post_dict, check_json=check_json, type='healthy')
     except BaseException:
         errmsg = f"```打卡请求出错```"
-        logging.warning('校内打卡请求出错,五分钟后重试...')
+        logging.warning(str(res))
+        logging.warning('\n校内打卡请求出错,五分钟后重试...')
         time.sleep(300)
         healthy_check_in(username, token, post_dict)
         return dict(status=0, errmsg=errmsg)
