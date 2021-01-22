@@ -15,11 +15,11 @@ def initLogging():
 
 def get_token(username, password,failtime):
     
-    while failtime > 0:
+    while True:
         user_dict = CampusCard(username, password).user_info
         if user_dict['login']==False:
-            failtime -=1
-            logging.warning('登陆失败，五秒后重试... 剩余次数：'+str(failtime))
+            failtime +=1
+            logging.warning('登陆失败，五秒后重试... 次数：'+str(failtime))
             time.sleep(5)
         else:
             return user_dict["sessionId"]
@@ -161,14 +161,17 @@ def healthy_check_in(username, token, post_dict):
         res = requests.post("https://reportedh5.17wanxiao.com/sass/api/epmpics", json=check_json).json()
         # 以json格式打印json字符串
         if res['code'] != '10000':
-            logging.warning(res)
+            logging.warning(res+'\n打卡失败，重试...')
+            # time.sleep(300)
             return dict(status=1, res=res, post_dict=post_dict, check_json=check_json, type='healthy')
         else:
             logging.info(res)
             return dict(status=1, res=res, post_dict=post_dict, check_json=check_json, type='healthy')
     except BaseException:
         errmsg = f"```打卡请求出错```"
-        logging.warning('校内打卡请求出错')
+        logging.warning('校内打卡请求出错,五分钟后重试...')
+        time.sleep(300)
+        healthy_check_in(username, token, post_dict)
         return dict(status=0, errmsg=errmsg)
 
 
@@ -380,8 +383,7 @@ def run():
         exit (config['main']['use_secret'])
     for username, password in zip([i.strip() for i in username_list if i != ''],
                                   [i.strip() for i in password_list if i != '']):
-        fail = 3
-        check_dict = check_in(username, password,fail)
+        check_dict = check_in(username, password,0)
         if not check_dict:
             server_push(sckey, "\n".join("打卡失败，请检查日志"))
             return
