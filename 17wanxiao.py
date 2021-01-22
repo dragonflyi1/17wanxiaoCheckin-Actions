@@ -13,11 +13,16 @@ def initLogging():
     logging.basicConfig(format="[%(levelname)s]; %(message)s")
 
 
-def get_token(username, password):
-    user_dict = CampusCard(username, password).user_info
-    if not user_dict['login']:
-        return None
-    return user_dict["sessionId"]
+def get_token(username, password,failtime):
+    
+    while failtime > 0:
+        user_dict = CampusCard(username, password).user_info
+        if user_dict['login']==False:
+            failtime -=1
+            logging.warning('登陆失败，正在重试... 剩余次数：'+str(failtime))
+        else:
+            return user_dict["sessionId"]
+    
 
 
 def get_post_json(jsons):
@@ -195,9 +200,9 @@ def campus_check_in(username, token, post_dict, id):
         return dict(status=0, errmsg=errmsg)
 
 
-def check_in(username, password):
+def check_in(username, password,failtime):
     # 登录获取token用于打卡
-    token = get_token(username, password)
+    token = get_token(username, password,failtime) 
     # print(token)
     check_dict_list = []
     # 获取现在是上午，还是下午，还是晚上
@@ -206,10 +211,6 @@ def check_in(username, password):
     # 获取学校使用打卡模板Id
     custom_id = get_custom_id(token)
 
-    if not token:
-        errmsg = f"{username[:4]}，获取token失败，打卡失败"
-        logging.warning(errmsg)
-        return False
 
     # 获取健康打卡的参数
     json1 = {"businessType": "epmpics",
@@ -378,8 +379,10 @@ def run():
         exit (config['main']['use_secret'])
     for username, password in zip([i.strip() for i in username_list if i != ''],
                                   [i.strip() for i in password_list if i != '']):
-        check_dict = check_in(username, password)
+        fail = 3
+        check_dict = check_in(username, password,fail)
         if not check_dict:
+            server_push(sckey, "\n".join("打卡失败，请检查日志"))
             return
         else:
             for check in check_dict:
