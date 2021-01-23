@@ -19,8 +19,8 @@ def get_token(username, password,failtime):
         user_dict = CampusCard(username, password).user_info
         if user_dict['login']==False:
             failtime +=1
-            logging.warning('登陆失败，三秒后重试... 次数：'+str(failtime))
-            time.sleep(3)
+            logging.warning('登陆失败，五秒后重试... 次数：'+str(failtime))
+            time.sleep(5)
         else:
             return user_dict["sessionId"]
     
