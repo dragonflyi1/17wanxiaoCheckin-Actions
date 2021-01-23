@@ -19,8 +19,8 @@ def get_token(username, password,failtime):
         user_dict = CampusCard(username, password).user_info
         if user_dict['login']==False:
             failtime +=1
-            logging.warning('登陆失败，五秒后重试... 次数：'+str(failtime))
-            time.sleep(5)
+            logging.warning('登陆失败，三秒后重试... 次数：'+str(failtime))
+            time.sleep(3)
         else:
             return user_dict["sessionId"]
     
@@ -41,8 +41,9 @@ def get_post_json(jsons):
         # {'msg': '业务异常', 'code': '10007', 'data': '无法找到该机构的投票模板数据!'}
         # ...
         if res['code'] != '10000':
-            # logging.warning(res)
-            return None
+            logging.warning(res)
+            logging.warning('异常，正在重试')
+            get_post_json(jsons)
         data = json.loads(res['data'])
         # print(data)
         post_dict = {
@@ -64,8 +65,6 @@ def get_post_json(jsons):
         # 在此处修改字段
         logging.info('获取完美校园打卡post参数成功')
         return post_dict
-    return None
-
 
 def receive_check_in(token, custom_id, post_dict):
     check_json = {
