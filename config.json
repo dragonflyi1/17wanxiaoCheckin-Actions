@@ -4,7 +4,7 @@
 # 是否在secret调用账户信息,适用于Action
 # 开启之后[account]部分失效
 
-use_secret = true
+use_secret = false
 
 
 [account]
@@ -13,6 +13,11 @@ user=
 
 #密码信息，用,隔开
 passwd=
+
+#设备信息，用,隔开
+deviceid=
+default_deviceid=
+
 
 #server酱的推送，暂时只有一个
 sckey=

@@ -13,10 +13,9 @@ def initLogging():
     logging.basicConfig(format="[%(levelname)s]; %(message)s")
 
 
-def get_token(username, password,failtime):
-    
+def get_token(username, password,deviceId,failtime):
     while True:
-        user_dict = CampusCard(username, password).user_info
+        user_dict = CampusCard(username, password,deviceId).user_info
         if user_dict['login']==False:
             failtime +=1
             logging.warning('登陆失败，五秒后重试... 次数：'+str(failtime))
@@ -201,9 +200,9 @@ def campus_check_in(username, token, post_dict, id):
         return dict(status=0, errmsg=errmsg)
 
 
-def check_in(username, password,failtime):
+def check_in(username, password,deviceId,failtime):
     # 登录获取token用于打卡
-    token = get_token(username, password,failtime) 
+    token = get_token(username, password,deviceId,failtime) 
     # print(token)
     check_dict_list = []
     # 获取现在是上午，还是下午，还是晚上
@@ -370,17 +369,20 @@ def run():
     if config['main']['use_secret']=='true':
         username_list = input().split(',')
         password_list = input().split(',')
+        deviceid_list = input().split(',')
         sckey = input()
     elif config['main']['use_secret']=='false':
         username_list = config['account']['user'].split(',')
         password_list = config['account']['passwd'].split(',')
+        deviceid_list = config['account']['deviceid'].split(',')
         sckey = config['account']['sckey']
     else:
         print("参数错误")
         exit (config['main']['use_secret'])
-    for username, password in zip([i.strip() for i in username_list if i != ''],
-                                  [i.strip() for i in password_list if i != '']):
-        check_dict = check_in(username, password,0)
+    for username, password , deviceId in zip([i.strip() for i in username_list if i != ''],
+                                  [i.strip() for i in password_list if i != ''],
+                                  [i.strip() for i in deviceid_list if i != '']):
+        check_dict = check_in(username, password,deviceId,0)
         if not check_dict:
             server_push(sckey, "\n".join("打卡失败，请检查日志"))
             return

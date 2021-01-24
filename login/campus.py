@@ -17,20 +17,31 @@ class CampusCard:
     """
     data = None
 
-    def __init__(self, phone, password, user_info=(None, '{}.info')):
+    def __init__(self, phone, password, deviceId,user_info=(None, '{}.info')):
         """
         初始化一卡通类
         :param phone: 完美校园账号
         :param password: 完美校园密码
         :param user_info: 已登录的虚拟设备
         """
-        self.user_info = user_info[0] if user_info[0] else self.__create_blank_user__()
+        if not deviceId:
+            config = ConfigParser()
+            config.read('config.json', encoding='UTF-8-sig')
+            deviceId = config['account']['default_deviceid']
+
+
+
+        self.user_info = user_info[0] if user_info[0] else self.__create_blank_user__(deviceId)
         if self.user_info['exchangeFlag']:
             self.exchange_secret()
             self.login(phone, password)
-
+        
+        """
+        with open(user_info[1].format(phone), 'w') as f:
+            f.write(self.save_user_info())
+        """
     @staticmethod
-    def __create_blank_user__():
+    def __create_blank_user__(deviceId):
         """
         当传入的已登录设备信息不可用时，虚拟一个空的未登录设备
         :return: 空设备信息
@@ -42,7 +53,7 @@ class CampusCard:
             'exchangeFlag': True,
             'login': False,
             'serverPublicKey': '',
-            'deviceId': str(random.randint(999999999999999, 9999999999999999)),
+            'deviceId': deviceId,
             'wanxiaoVersion': 10462101,
             'rsaKey': {
                 'private': rsa_keys[1],
@@ -88,10 +99,10 @@ class CampusCard:
             "password": password_list,
             "qudao": "guanwang",
             "requestMethod": "cam_iface46/loginnew.action",
-            "shebeixinghao": "MLA-AL10",
+            "shebeixinghao": "AutoDaka",
             "systemType": "android",
-            "telephoneInfo": "5.1.1",
-            "telephoneModel": "HUAWEI MLA-AL10",
+            "telephoneInfo": "2.3.3",
+            "telephoneModel": "GiriNeko AutoDaka Server",
             "type": "1",
             "userName": phone,
             "wanxiaoVersion": 10462101,
