@@ -270,7 +270,7 @@ def check_in(username, password,deviceId,failtime):
 
 
 def server_push(sckey, desp):
-    send_url = f"https://sc.ftqq.com/{sckey}.send"
+    send_url = f"https://sctapi.ftqq.com/{sckey}.send"
     params = {
         "text": "健康打卡推送通知",
         "desp": desp
